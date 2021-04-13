@@ -38,7 +38,6 @@ class SaveReminderFragment : BaseFragment() {
     private val geofencePendingIntent: PendingIntent by lazy {
         val intent = Intent(requireActivity(), GeofenceBroadcastReceiver::class.java)
         intent.action = ACTION_GEOFENCE_EVENT
-
         PendingIntent.getBroadcast(requireContext(), 0, intent, PendingIntent.FLAG_UPDATE_CURRENT)
     }
 
@@ -94,7 +93,6 @@ class SaveReminderFragment : BaseFragment() {
             if (_viewModel.validateEnteredData(reminderData)) {
                 _viewModel.validateAndSaveReminder(reminderData)
                 addGeofenceForReminder(reminderData)
-                checkPermissionsAndStartGeofencing()
             }
         }
     }
@@ -125,8 +123,6 @@ class SaveReminderFragment : BaseFragment() {
                 .addGeofence(geofence)
                 .build()
 
-        val intent = Intent(requireContext(), GeofenceBroadcastReceiver::class.java)
-        intent.action = ACTION_GEOFENCE_EVENT
 
         geofencingClient.addGeofences(geofencingRequest, geofencePendingIntent)?.run {
             addOnSuccessListener {
@@ -236,7 +232,7 @@ class SaveReminderFragment : BaseFragment() {
     }
 
     companion object {
-        const val GEOFENCE_RADIUS_IN_METERS = 100f
+        const val GEOFENCE_RADIUS_IN_METERS = 50f
         const val ACTION_GEOFENCE_EVENT = "SaveReminderFragment.action.ACTION_GEOFENCE_EVENT"
 
 
