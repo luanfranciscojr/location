@@ -14,7 +14,9 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runBlockingTest
 import org.hamcrest.CoreMatchers
 import org.hamcrest.MatcherAssert
+import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.core.Is
+import org.hamcrest.core.Is.`is`
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -43,7 +45,6 @@ class SaveReminderViewModelTest {
     fun setupViewModel() {
         stopKoin()
         app = ApplicationProvider.getApplicationContext()
-        FirebaseApp.initializeApp(app)
         fakeDataSource = FakeDataSource()
         viewModel = SaveReminderViewModel(app, fakeDataSource)
     }
@@ -92,6 +93,24 @@ class SaveReminderViewModelTest {
 
     }
 
+
+
+
+    @Test
+    fun validateEnteredData_ShowError() {
+
+        // Give a reminder with empty title
+        val reminder = ReminderDataItem(null , "Teste Description", "Teste localtion", 1.0, 1.0);
+
+        // When validate and save reminder
+        viewModel.validateAndSaveReminder(reminder)
+
+        // The snackBar with enter title is shown
+        assertThat(
+                viewModel.showSnackBarInt.getOrAwaitValue(),
+                (`is`(R.string.err_enter_title))
+        )
+    }
 
 
 }

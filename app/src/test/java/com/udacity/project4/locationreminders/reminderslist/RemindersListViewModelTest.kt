@@ -1,5 +1,6 @@
 package com.udacity.project4.locationreminders.reminderslist
 
+import android.app.Application
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
@@ -33,15 +34,16 @@ class RemindersListViewModelTest {
 
     private lateinit var remindersListViewModel: RemindersListViewModel;
     private lateinit var fakeDataSource: FakeDataSource;
-
+    private lateinit var app: Application
 
     @Before
     fun setupViewModel() {
         stopKoin()
-        FirebaseApp.initializeApp(ApplicationProvider.getApplicationContext())
+        app = ApplicationProvider.getApplicationContext()
+        FirebaseApp.initializeApp(app)
         fakeDataSource = FakeDataSource()
         remindersListViewModel =
-            RemindersListViewModel(ApplicationProvider.getApplicationContext(), fakeDataSource)
+            RemindersListViewModel(app, fakeDataSource)
     }
 
 
@@ -96,6 +98,20 @@ class RemindersListViewModelTest {
 
         // Then - hide loading
         assertThat(remindersListViewModel.showLoading.getOrAwaitValue(), (`is`(false)))
+
+    }
+
+    @Test
+    fun unavailableReminder_ShouldReturnError() = mainCoroutineRule.runBlockingTest {
+        //Given any Error
+        fakeDataSource.setReturnError(true)
+
+        // When loading reminders
+        remindersListViewModel.loadReminders()
+
+        // Then reminders list is empty and no data is shown
+        val showSnackBar = remindersListViewModel.showSnackBar.getOrAwaitValue()
+        assertThat(showSnackBar, (`is`("Exception getReminder")))
 
     }
 
